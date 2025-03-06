@@ -17,7 +17,6 @@ function App() {
        <Route path="/Sobre_mi" element={<SobreMi />} />
        <Route path="/Sesion" element={<Sesion />} />
       </Routes>
-
     </Router>
   );
 }
