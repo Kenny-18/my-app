@@ -6,7 +6,6 @@ import Inicio from './components/pages/inicio';
 import SobreMi from './components/pages/Sobre_mi';
 import Experiencias from './components/pages/Experiencias';
 import Sesion from './components/pages/Sesion';
-
 function App() {
   return (
     <Router>
