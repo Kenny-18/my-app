@@ -18,15 +18,11 @@ function Navbar() {
       setButton(true);
     }
   };
-
   useEffect(() => {
     showButton();
   }, []);
-
   window.addEventListener('resize', showButton);
-
   return (
-    
     <>
     <video src={video} autoPlay loop muted /> 
       <nav className='navbar'>
