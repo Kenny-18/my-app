@@ -59,7 +59,9 @@ function Navbar() {
             </li>
           </ul>
           {button && (
-  <Link to="/Sesion">
+  <Link to="/Sesion"
+  className='nav-links'
+  onClick={closeMobileMenu}>
     <Button buttonStyle="btn--outline">Iniciar Sesión</Button>
   </Link>
 )}
