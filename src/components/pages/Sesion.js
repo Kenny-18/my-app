@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import '../../App.css';
+import { auth, provider } from '../firebase';
+import { signInWithPopup } from 'firebase/auth';
 
 export default function Login() {
   const [username, setUsername] = useState('');
@@ -13,6 +15,16 @@ export default function Login() {
     } else {
       setMessage('Usuario o contraseña incorrectos ❌');
     }
+  };
+
+  const handleGoogleLogin = () => {
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        setMessage(`Bienvenido ${result.user.displayName} ✅`);
+      })
+      .catch((error) => {
+        setMessage(`Error al iniciar sesión con Google ❌: ${error.message}`);
+      });
   };
 
   return (
@@ -39,6 +51,7 @@ export default function Login() {
         </div>
         <button type="submit">Iniciar Sesión</button>
       </form>
+      <button onClick={handleGoogleLogin}>Iniciar sesión con Google</button>
       {message && <p>{message}</p>}
     </div>
   );
