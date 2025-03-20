@@ -3,6 +3,7 @@ import './Terceraparte.css';
 import { Link } from 'react-router-dom';
 import video from '../videos/Fondo.mp4';
 
+
 function Terceraparte() {
   return (
     <div className='footer-container'>
@@ -12,23 +13,14 @@ function Terceraparte() {
       <div className='footer-links'>
         <div className='footer-link-wrapper'>
           <div className='footer-link-items'>
-          <h2>titulo</h2>
-            <Link to='/'>informacion</Link>
+          <h2>contactanos</h2>
+            <Link to='https://wa.me/+50431538299'>whatsap</Link>
             <Link to='/'>informacion</Link>
             <Link to='/'>informacion</Link>
             <Link to='/'>informacion</Link>
           </div>
           <div className='footer-link-items'>
            <h2>titulo</h2>
-            <Link to='/'>informacion</Link>
-            <Link to='/'>informacion</Link>
-            <Link to='/'>informacion</Link>
-            <Link to='/'>informacion</Link>
-          </div>
-        </div>
-        <div className='footer-link-wrapper'>
-          <div className='footer-link-items'>
-            <h2>titulo</h2>
             <Link to='/'>informacion</Link>
             <Link to='/'>informacion</Link>
             <Link to='/'>informacion</Link>

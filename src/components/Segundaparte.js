@@ -9,15 +9,11 @@ function Segundaparte() {
       <div className='cards__container'>
         <div className='cards__wrapper'>
           <ul className='cards__items'>
+          <h1 className='informacion'>para esta pagina puedes crear su respecivo portafolio con su informacion
+            personal completamente segura
+          </h1>
             <CardItem
-              src='../images/img-1.jpg'
-               alt='kenny'
-               text='Mi nombre es Kenny y estoy en mi segundo año de universidad'
-            />
-            <CardItem
-              src='../images/img-2.jpg'
-              text='¡Hola! Soy Gelsin Maradiaga, estudiante de Informática Administrativa.
-               Me dedico a aprender y mejorar en el uso de la tecnología para optimizar procesos.'
+              src='../images/portafolio.jpg'
             />
           </ul>
         </div>

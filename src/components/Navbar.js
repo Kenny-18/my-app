@@ -39,24 +39,6 @@ function Navbar() {
                 inicio
               </Link>
             </li>
-            <li className='nav-item'>
-              <Link
-                to='/Experiencias'
-                className='nav-links'
-                onClick={closeMobileMenu}
-              >
-                experiencias
-              </Link>
-            </li>
-            <li className='nav-item'>
-              <Link
-                to='/Sobre_mi'
-                className='nav-links'
-                onClick={closeMobileMenu}
-              >
-                sobre mi
-              </Link>
-            </li>
           </ul>
           {button && (
   <Link to="/Sesion"

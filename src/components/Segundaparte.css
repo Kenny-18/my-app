@@ -3,12 +3,18 @@
   }
   
   .presentacion {
-      text-align: center;
-  }
-  
-  h1 {
     text-align: center;
+    font-size: 48px; 
   }
+  .informacion {
+    text-align:center ;
+    font-size: 35px; 
+    width: 70%;
+   word-wrap: break-word;
+   background-color: #ffffff; 
+   padding-top: 70px;
+   border-radius: 10px;
+    }
   
   
   .cards__container {
@@ -31,9 +37,10 @@
   
   .cards__item {
     padding-left: 20px;
+    padding-right: 20px;
     display: flex;
     flex: 1;
-    margin: 0 1rem;
+    margin: 10px 1;
     border-radius: 10px;
     background-color: #ffffff;
   }
@@ -53,7 +60,7 @@
   .cards__item__pic-wrap {
     position: relative;
     width: 100%;
-    padding-top: 67%;
+    padding-top: 100%;
     overflow: hidden;
   }
   
@@ -62,19 +69,6 @@
     animation-duration: 2s;
   }
   
-  .cards__item__pic-wrap::after {
-    content: attr(data-category);
-    position: absolute;
-    bottom: 0;
-    margin-left: 10px;
-    padding: 6px 8px;
-    max-width: calc((100%) - 60px);
-    font-size: 12px;
-    font-weight: 700;
-    color: #fff;
-    background-color: #1f98f4;
-    box-sizing: border-box;
-  }
   
   .cards__item__img {
     position: absolute;
@@ -99,11 +93,6 @@
     padding: 20px 30px 30px;
   }
   
-  .cards__item__text {
-    color: #000000;
-    font-size: 20px;
-    line-height: 30px;
-  }
   
   @media only screen and (min-width: 1200px) {
     .content__blog__container {
