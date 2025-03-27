@@ -1,225 +1,204 @@
 .portfolio-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 40px 20px;
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  }
-  
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.portfolio-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.user-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #13f0c4;
+}
+
+.user-info h1 {
+  font-size: 2.5rem;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.user-info h2 {
+  font-size: 1.5rem;
+  color: #666;
+  font-weight: 400;
+}
+
+.portfolio-tabs {
+  display: flex;
+  gap: 10px;
+}
+
+.tab-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.tab-button.active {
+  background-color: #13f0c4;
+  color: #000;
+}
+
+.tab-button:hover:not(.active) {
+  background-color: #e0e0e0;
+}
+
+.portfolio-content {
+  display: grid;
+  gap: 30px;
+}
+
+.about-section,
+.skills-section,
+.projects-section {
+  margin-bottom: 30px;
+}
+
+.about-section h3,
+.skills-section h3,
+.projects-section h3 {
+  font-size: 1.8rem;
+  margin-bottom: 15px;
+  color: #333;
+  border-bottom: 2px solid #13f0c4;
+  padding-bottom: 5px;
+  display: inline-block;
+}
+
+.contact-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 15px;
+  margin-top: 20px;
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.contact-item i {
+  color: #13f0c4;
+  font-size: 1.2rem;
+  width: 20px;
+  text-align: center;
+}
+
+.contact-item a {
+  color: #0066cc;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.contact-item a:hover {
+  color: #004499;
+  text-decoration: underline;
+}
+
+.skills-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.skill-tag {
+  background-color: #f0f0f0;
+  padding: 8px 15px;
+  border-radius: 20px;
+  font-size: 14px;
+  color: #333;
+}
+
+.projects-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.project-card {
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.project-card h4 {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.portfolio-edit-content {
+  padding: 20px 0;
+}
+
+@media (max-width: 768px) {
   .portfolio-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #eee;
-  }
-  
-  .user-info {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-  }
-  
-  .user-avatar {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid #13f0c4;
-  }
-  
-  .user-info h1 {
-    font-size: 2.5rem;
-    margin-bottom: 5px;
-    color: #333;
-  }
-  
-  .user-info h2 {
-    font-size: 1.5rem;
-    color: #666;
-    font-weight: 400;
-  }
-  
-  .edit-button,
-  .save-button {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-  
-  .edit-button {
-    background-color: #13f0c4;
-    color: #000;
-  }
-  
-  .save-button {
-    background-color: #4caf50;
-    color: white;
-  }
-  
-  .edit-button:hover {
-    background-color: #0fd1aa;
-  }
-  
-  .save-button:hover {
-    background-color: #45a049;
-  }
-  
-  .portfolio-content {
-    display: grid;
-    gap: 30px;
-  }
-  
-  .about-section,
-  .skills-section,
-  .projects-section {
-    margin-bottom: 30px;
-  }
-  
-  .about-section h3,
-  .skills-section h3,
-  .projects-section h3 {
-    font-size: 1.8rem;
-    margin-bottom: 15px;
-    color: #333;
-    border-bottom: 2px solid #13f0c4;
-    padding-bottom: 5px;
-    display: inline-block;
-  }
-  
-  .skills-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  
-  .skill-tag {
-    background-color: #f0f0f0;
-    padding: 8px 15px;
-    border-radius: 20px;
-    font-size: 14px;
-    color: #333;
-  }
-  
-  .projects-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
-  }
-  
-  .project-card {
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  }
-  
-  .project-card h4 {
-    font-size: 1.2rem;
-    margin-bottom: 10px;
-    color: #333;
-  }
-  
-  .portfolio-edit-form {
-    display: grid;
-    gap: 20px;
-  }
-  
-  .form-group {
-    display: flex;
     flex-direction: column;
-    gap: 8px;
+    align-items: flex-start;
+    gap: 20px;
   }
-  
-  .form-group label {
-    font-weight: 500;
-    color: #555;
+
+  .user-info {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: center;
+    width: 100%;
   }
-  
-  .form-group input,
-  .form-group textarea {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 16px;
+
+  .user-avatar {
+    margin: 0 auto;
   }
-  
-  .form-group textarea {
-    min-height: 150px;
-    resize: vertical;
+
+  .user-info h1,
+  .user-info h2 {
+    text-align: center;
+    width: 100%;
   }
-  
-  .skill-input-group {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
+
+  .portfolio-tabs {
+    width: 100%;
   }
-  
-  .skill-input-group input {
+
+  .tab-button {
     flex: 1;
+    text-align: center;
   }
-  
-  .skill-input-group button {
-    padding: 5px 10px;
-    background-color: #ff6b6b;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+
+  .projects-list {
+    grid-template-columns: 1fr;
   }
-  
-  .add-skill-btn {
-    background-color: #13f0c4;
-    color: #000;
-    border: none;
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: 500;
-    margin-top: 10px;
+
+  .contact-info {
+    grid-template-columns: 1fr;
   }
-  
-  .add-skill-btn:hover {
-    background-color: #0fd1aa;
-  }
-  
-  @media (max-width: 768px) {
-    .portfolio-header {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 20px;
-    }
-  
-    .user-info {
-      flex-direction: column;
-      align-items: flex-start;
-      text-align: center;
-      width: 100%;
-    }
-  
-    .user-avatar {
-      margin: 0 auto;
-    }
-  
-    .user-info h1,
-    .user-info h2 {
-      text-align: center;
-      width: 100%;
-    }
-  
-    .edit-button,
-    .save-button {
-      width: 100%;
-    }
-  
-    .projects-list {
-      grid-template-columns: 1fr;
-    }
-  }
-  
-  
+}
+
