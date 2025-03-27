@@ -4,7 +4,7 @@ import { auth, provider, database } from '../firebase';
 import { signInWithPopup } from 'firebase/auth';
 import { ref, set } from 'firebase/database';
 
-export default function Login() {
+export default function Sesion() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
@@ -16,7 +16,7 @@ export default function Login() {
     e.preventDefault();
     if (username === 'admin' && password === '1234') {
       setMessage('Inicio de sesión exitoso ✅');
-      navigate('/Sobre_mi');  // Redirigir a la página 'Sobre_mi'
+      navigate('/SobreMi');  // Redirigir a la página 'Sobre_mi'
     } else {
       setMessage('Usuario o contraseña incorrectos ❌');
     }
@@ -26,7 +26,7 @@ export default function Login() {
     signInWithPopup(auth, provider)
       .then((result) => {
         setMessage(`Bienvenido ${result.user.displayName} ✅`);
-        navigate('/Sobre_mi');  // Redirigir a la página 'Sobre_mi'
+        navigate('/SobreMi');  // Redirigir a la página 'Sobre_mi'
       })
       .catch((error) => {
         setMessage(`Error al iniciar sesión con Google ❌: ${error.message}`);
@@ -37,7 +37,7 @@ export default function Login() {
     auth.signOut()
       .then(() => {
         setMessage('Cierre de sesión exitoso ✅');
-        navigate('/');  // Redirigir a la página de login
+        navigate('/Sesion');  // Redirigir a la página de login
       })
       .catch((error) => {
         setMessage(`Error al cerrar sesión ❌: ${error.message}`);

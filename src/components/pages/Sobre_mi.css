@@ -1,0 +1,225 @@
+.portfolio-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+  
+  .portfolio-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  .user-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #13f0c4;
+  }
+  
+  .user-info h1 {
+    font-size: 2.5rem;
+    margin-bottom: 5px;
+    color: #333;
+  }
+  
+  .user-info h2 {
+    font-size: 1.5rem;
+    color: #666;
+    font-weight: 400;
+  }
+  
+  .edit-button,
+  .save-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .edit-button {
+    background-color: #13f0c4;
+    color: #000;
+  }
+  
+  .save-button {
+    background-color: #4caf50;
+    color: white;
+  }
+  
+  .edit-button:hover {
+    background-color: #0fd1aa;
+  }
+  
+  .save-button:hover {
+    background-color: #45a049;
+  }
+  
+  .portfolio-content {
+    display: grid;
+    gap: 30px;
+  }
+  
+  .about-section,
+  .skills-section,
+  .projects-section {
+    margin-bottom: 30px;
+  }
+  
+  .about-section h3,
+  .skills-section h3,
+  .projects-section h3 {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    color: #333;
+    border-bottom: 2px solid #13f0c4;
+    padding-bottom: 5px;
+    display: inline-block;
+  }
+  
+  .skills-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .skill-tag {
+    background-color: #f0f0f0;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+    color: #333;
+  }
+  
+  .projects-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+  
+  .project-card {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .project-card h4 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    color: #333;
+  }
+  
+  .portfolio-edit-form {
+    display: grid;
+    gap: 20px;
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .form-group label {
+    font-weight: 500;
+    color: #555;
+  }
+  
+  .form-group input,
+  .form-group textarea {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+  }
+  
+  .form-group textarea {
+    min-height: 150px;
+    resize: vertical;
+  }
+  
+  .skill-input-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .skill-input-group input {
+    flex: 1;
+  }
+  
+  .skill-input-group button {
+    padding: 5px 10px;
+    background-color: #ff6b6b;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .add-skill-btn {
+    background-color: #13f0c4;
+    color: #000;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 500;
+    margin-top: 10px;
+  }
+  
+  .add-skill-btn:hover {
+    background-color: #0fd1aa;
+  }
+  
+  @media (max-width: 768px) {
+    .portfolio-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 20px;
+    }
+  
+    .user-info {
+      flex-direction: column;
+      align-items: flex-start;
+      text-align: center;
+      width: 100%;
+    }
+  
+    .user-avatar {
+      margin: 0 auto;
+    }
+  
+    .user-info h1,
+    .user-info h2 {
+      text-align: center;
+      width: 100%;
+    }
+  
+    .edit-button,
+    .save-button {
+      width: 100%;
+    }
+  
+    .projects-list {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  
