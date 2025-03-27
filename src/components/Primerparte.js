@@ -7,7 +7,7 @@ function Primerparte() {
   return (
     <div className="hero-container">
       <video src={video} autoPlay loop muted />
-      <h1>Simulador de Portafolio</h1>
+      <h1>Tu Portafolio</h1>
       <p>Crea tu portafolio profesional en minutos</p>
       <div className="hero-btns">
         <Link to="/Sesion" className="btn-mobile">
