@@ -8,8 +8,15 @@ import PersonalInfoForm from "./PersonalInfoForm"
 import EducationForm from "./EducationForm"
 import ExperienceForm from "./ExperienceForm"
 import ProfilePhotoUploader from "./ProfilePhotoUploader"
+import ProjectForm from "./ProjectForm"
+import SkillsForm from "./SkillsForm"
+import LanguagesForm from "./LanguagesForm"
+import ReferencesForm from "./ReferencesForm"
+import ContactForm from "./ContactForm"
 import { auth, database } from "../firebase"
 import { ref, get } from "firebase/database"
+// 1. Añadir la importación del nuevo componente PortfolioPreview
+import PortfolioPreview from "./PortfolioPreview"
 
 export default function SobreMi() {
   const navigate = useNavigate()
@@ -37,12 +44,96 @@ export default function SobreMi() {
     },
     education: [],
     experience: [],
-    skills: ["HTML", "CSS", "JavaScript", "React"],
-    projects: [
-      { title: "Proyecto 1", description: "Descripción del proyecto 1" },
-      { title: "Proyecto 2", description: "Descripción del proyecto 2" },
-    ],
+    skills: [],
+    projects: [],
+    languages: [],
+    references: [],
+    contact: {},
   })
+
+  // Mover la función loadFromLocalStorage fuera del useEffect para que sea accesible en todo el componente
+  // Añadir esta función justo después de la declaración de los estados, antes del useEffect
+
+  // Añadir esta función después de la línea donde se declaran los estados (aproximadamente línea 45)
+  const loadFromLocalStorage = () => {
+    console.log("Cargando datos desde localStorage")
+    try {
+      const savedPersonalInfo = localStorage.getItem("personalInfo")
+      const savedEducation = localStorage.getItem("educationData")
+      const savedExperience = localStorage.getItem("experienceData")
+      const savedSkills = localStorage.getItem("skillsData")
+      const savedProjects = localStorage.getItem("projectsData")
+      const savedLanguages = localStorage.getItem("languagesData")
+      const savedReferences = localStorage.getItem("referencesData")
+      const savedContact = localStorage.getItem("contactData")
+
+      if (savedPersonalInfo) {
+        console.log("Información personal encontrada en localStorage")
+        setPortfolioData((prevData) => ({
+          ...prevData,
+          personalInfo: JSON.parse(savedPersonalInfo),
+        }))
+      }
+
+      if (savedEducation) {
+        console.log("Datos de educación encontrados en localStorage")
+        setPortfolioData((prevData) => ({
+          ...prevData,
+          education: JSON.parse(savedEducation),
+        }))
+      }
+
+      if (savedExperience) {
+        console.log("Datos de experiencia encontrados en localStorage")
+        setPortfolioData((prevData) => ({
+          ...prevData,
+          experience: JSON.parse(savedExperience),
+        }))
+      }
+
+      if (savedSkills) {
+        console.log("Datos de habilidades encontrados en localStorage")
+        setPortfolioData((prevData) => ({
+          ...prevData,
+          skills: JSON.parse(savedSkills),
+        }))
+      }
+
+      if (savedProjects) {
+        console.log("Datos de proyectos encontrados en localStorage")
+        setPortfolioData((prevData) => ({
+          ...prevData,
+          projects: JSON.parse(savedProjects),
+        }))
+      }
+
+      if (savedLanguages) {
+        console.log("Datos de idiomas encontrados en localStorage")
+        setPortfolioData((prevData) => ({
+          ...prevData,
+          languages: JSON.parse(savedLanguages),
+        }))
+      }
+
+      if (savedReferences) {
+        console.log("Datos de referencias encontrados en localStorage")
+        setPortfolioData((prevData) => ({
+          ...prevData,
+          references: JSON.parse(savedReferences),
+        }))
+      }
+
+      if (savedContact) {
+        console.log("Datos de contacto encontrados en localStorage")
+        setPortfolioData((prevData) => ({
+          ...prevData,
+          contact: JSON.parse(savedContact),
+        }))
+      }
+    } catch (error) {
+      console.error("Error al cargar desde localStorage:", error)
+    }
+  }
 
   // Verificar autenticación y cargar datos
   useEffect(() => {
@@ -102,6 +193,9 @@ export default function SobreMi() {
             experience: data.experience || [],
             skills: data.skills || prevData.skills,
             projects: data.projects || prevData.projects,
+            languages: data.languages || [],
+            references: data.references || [],
+            contact: data.contact || {},
           }))
         } else {
           console.log("No se encontraron datos en Firebase, usando predeterminados")
@@ -120,40 +214,10 @@ export default function SobreMi() {
     }
 
     // Función para cargar desde localStorage como respaldo
-    const loadFromLocalStorage = () => {
-      console.log("Cargando datos desde localStorage")
-      try {
-        const savedPersonalInfo = localStorage.getItem("personalInfo")
-        const savedEducation = localStorage.getItem("educationData")
-        const savedExperience = localStorage.getItem("experienceData")
-
-        if (savedPersonalInfo) {
-          console.log("Información personal encontrada en localStorage")
-          setPortfolioData((prevData) => ({
-            ...prevData,
-            personalInfo: JSON.parse(savedPersonalInfo),
-          }))
-        }
-
-        if (savedEducation) {
-          console.log("Datos de educación encontrados en localStorage")
-          setPortfolioData((prevData) => ({
-            ...prevData,
-            education: JSON.parse(savedEducation),
-          }))
-        }
-
-        if (savedExperience) {
-          console.log("Datos de experiencia encontrados en localStorage")
-          setPortfolioData((prevData) => ({
-            ...prevData,
-            experience: JSON.parse(savedExperience),
-          }))
-        }
-      } catch (error) {
-        console.error("Error al cargar desde localStorage:", error)
-      }
-    }
+    // Ahora eliminar la definición de loadFromLocalStorage dentro del useEffect
+    // Buscar la definición dentro del useEffect (aproximadamente línea 150) y eliminarla
+    // Reemplazar la definición completa de la función con:
+    // const loadFromLocalStorage = loadFromLocalStorage;
 
     return () => {
       unsubscribe()
@@ -186,6 +250,46 @@ export default function SobreMi() {
     }))
   }
 
+  // Manejar el guardado de habilidades
+  const handleSaveSkills = (data) => {
+    setPortfolioData((prevData) => ({
+      ...prevData,
+      skills: data,
+    }))
+  }
+
+  // Manejar el guardado de proyectos
+  const handleSaveProjects = (data) => {
+    setPortfolioData((prevData) => ({
+      ...prevData,
+      projects: data,
+    }))
+  }
+
+  // Manejar el guardado de idiomas
+  const handleSaveLanguages = (data) => {
+    setPortfolioData((prevData) => ({
+      ...prevData,
+      languages: data,
+    }))
+  }
+
+  // Manejar el guardado de referencias
+  const handleSaveReferences = (data) => {
+    setPortfolioData((prevData) => ({
+      ...prevData,
+      references: data,
+    }))
+  }
+
+  // Manejar el guardado de información de contacto
+  const handleSaveContact = (data) => {
+    setPortfolioData((prevData) => ({
+      ...prevData,
+      contact: data,
+    }))
+  }
+
   // Manejar la actualización de la foto de perfil
   const handlePhotoUpdate = (photoURL) => {
     setPortfolioData((prevData) => ({
@@ -197,26 +301,23 @@ export default function SobreMi() {
     }))
   }
 
-  // Ordenar experiencias por fecha (más reciente primero)
-  const sortedExperiences = [...(portfolioData.experience || [])].sort((a, b) => {
-    // Si alguno es trabajo actual, va primero
-    if (a.current && !b.current) return -1
-    if (!a.current && b.current) return 1
-
-    // Si ambos son actuales o ambos no son actuales, comparar por fecha de inicio
-    const dateA = a.current ? new Date() : new Date(a.endDate)
-    const dateB = b.current ? new Date() : new Date(b.endDate)
-    return dateB - dateA
-  })
-
-  // Función para forzar la carga
-  const handleForceLoad = () => {
-    setLoading(false)
-  }
-
   // Determinar la URL de la foto de perfil
   const profilePhotoURL =
     portfolioData.personalInfo?.photoURL || user?.photoURL || "/placeholder.svg?height=100&width=100"
+
+  // Add a function to handle image loading errors
+  const handleImageError = (e) => {
+    console.error("Error loading image:", e.target.src)
+    e.target.src = "https://via.placeholder.com/100"
+    e.target.onerror = null // Prevent infinite loop
+  }
+
+  // Function to force load default data
+  const handleForceLoad = () => {
+    setLoading(false)
+    setLoadError("Carga forzada. Usando datos predeterminados.")
+    loadFromLocalStorage()
+  }
 
   if (loading) {
     return (
@@ -230,6 +331,12 @@ export default function SobreMi() {
     )
   }
 
+  // 3. Añadir una función para manejar la edición rápida desde la vista previa
+  const handleEditFromPreview = (section) => {
+    setActiveTab("edit")
+    setActiveEditSection(section)
+  }
+
   return (
     <div className="portfolio-container">
       {loadError && (
@@ -240,7 +347,12 @@ export default function SobreMi() {
 
       <div className="portfolio-header">
         <div className="user-info">
-          <img src={profilePhotoURL || "/placeholder.svg"} alt="Foto de perfil" className="user-avatar" />
+          <img
+            src={profilePhotoURL || "/placeholder.svg"}
+            alt="Foto de perfil"
+            className="user-avatar"
+            onError={handleImageError}
+          />
           <div>
             <h1>{portfolioData.personalInfo?.fullName || user?.displayName || user?.email?.split("@")[0]}</h1>
             <h2>{portfolioData.personalInfo?.profession || "Profesional"}</h2>
@@ -260,132 +372,7 @@ export default function SobreMi() {
       </div>
 
       {activeTab === "preview" ? (
-        <div className="portfolio-content">
-          <section className="about-section">
-            <h3>Sobre Mí</h3>
-            <p>{portfolioData.personalInfo?.bio}</p>
-
-            <div className="contact-info">
-              <div className="contact-item">
-                <i className="fas fa-envelope"></i>
-                <span>{portfolioData.personalInfo?.email || user?.email}</span>
-              </div>
-
-              {portfolioData.personalInfo?.phone && (
-                <div className="contact-item">
-                  <i className="fas fa-phone"></i>
-                  <span>{portfolioData.personalInfo.phone}</span>
-                </div>
-              )}
-
-              <div className="contact-item">
-                <i className="fas fa-map-marker-alt"></i>
-                <span>{portfolioData.personalInfo?.location || "No especificada"}</span>
-              </div>
-
-              {portfolioData.personalInfo?.website && (
-                <div className="contact-item">
-                  <i className="fas fa-globe"></i>
-                  <a href={portfolioData.personalInfo.website} target="_blank" rel="noopener noreferrer">
-                    Sitio Web
-                  </a>
-                </div>
-              )}
-
-              {portfolioData.personalInfo?.linkedin && (
-                <div className="contact-item">
-                  <i className="fab fa-linkedin"></i>
-                  <a href={portfolioData.personalInfo.linkedin} target="_blank" rel="noopener noreferrer">
-                    LinkedIn
-                  </a>
-                </div>
-              )}
-
-              {portfolioData.personalInfo?.github && (
-                <div className="contact-item">
-                  <i className="fab fa-github"></i>
-                  <a href={portfolioData.personalInfo.github} target="_blank" rel="noopener noreferrer">
-                    GitHub
-                  </a>
-                </div>
-              )}
-            </div>
-          </section>
-
-          {sortedExperiences.length > 0 && (
-            <section className="experience-section">
-              <h3>Experiencia Laboral</h3>
-              <div className="experience-preview-list">
-                {sortedExperiences.map((exp, index) => (
-                  <div key={index} className="experience-preview-item">
-                    <div className="experience-preview-header">
-                      <h4>{exp.position}</h4>
-                      <span className="experience-preview-dates">
-                        {exp.startDate} - {exp.current ? "Actual" : exp.endDate}
-                      </span>
-                    </div>
-                    <p className="experience-preview-company">
-                      <i className="fas fa-building"></i> {exp.company}
-                    </p>
-                    {exp.description && <p className="experience-preview-description">{exp.description}</p>}
-                    {exp.achievements && (
-                      <div className="experience-preview-achievements">
-                        <strong>Logros:</strong>
-                        <p>{exp.achievements}</p>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {portfolioData.education && portfolioData.education.length > 0 && (
-            <section className="education-section">
-              <h3>Formación Académica</h3>
-              <div className="education-preview-list">
-                {portfolioData.education.map((edu, index) => (
-                  <div key={index} className="education-preview-item">
-                    <div className="education-preview-header">
-                      <h4>{edu.institution}</h4>
-                      <span className="education-preview-dates">
-                        {edu.startDate} - {edu.current ? "Actual" : edu.endDate}
-                      </span>
-                    </div>
-                    <p className="education-preview-degree">
-                      <strong>{edu.degree}</strong>
-                      {edu.fieldOfStudy && <span> en {edu.fieldOfStudy}</span>}
-                    </p>
-                    {edu.description && <p className="education-preview-description">{edu.description}</p>}
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-
-          <section className="skills-section">
-            <h3>Habilidades</h3>
-            <div className="skills-list">
-              {portfolioData.skills.map((skill, index) => (
-                <span key={index} className="skill-tag">
-                  {skill}
-                </span>
-              ))}
-            </div>
-          </section>
-
-          <section className="projects-section">
-            <h3>Proyectos</h3>
-            <div className="projects-list">
-              {portfolioData.projects.map((project, index) => (
-                <div key={index} className="project-card">
-                  <h4>{project.title}</h4>
-                  <p>{project.description}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-        </div>
+        <PortfolioPreview portfolioData={portfolioData} onEditSection={handleEditFromPreview} />
       ) : (
         <div className="portfolio-edit-content">
           <div className="edit-sections-tabs">
@@ -413,6 +400,36 @@ export default function SobreMi() {
             >
               Formación Académica
             </button>
+            <button
+              className={`edit-section-tab ${activeEditSection === "skills" ? "active" : ""}`}
+              onClick={() => setActiveEditSection("skills")}
+            >
+              Habilidades
+            </button>
+            <button
+              className={`edit-section-tab ${activeEditSection === "languages" ? "active" : ""}`}
+              onClick={() => setActiveEditSection("languages")}
+            >
+              Idiomas
+            </button>
+            <button
+              className={`edit-section-tab ${activeEditSection === "projects" ? "active" : ""}`}
+              onClick={() => setActiveEditSection("projects")}
+            >
+              Proyectos
+            </button>
+            <button
+              className={`edit-section-tab ${activeEditSection === "references" ? "active" : ""}`}
+              onClick={() => setActiveEditSection("references")}
+            >
+              Referencias
+            </button>
+            <button
+              className={`edit-section-tab ${activeEditSection === "contact" ? "active" : ""}`}
+              onClick={() => setActiveEditSection("contact")}
+            >
+              Contacto
+            </button>
           </div>
 
           {activeEditSection === "photo" && (
@@ -433,6 +450,26 @@ export default function SobreMi() {
 
           {activeEditSection === "education" && (
             <EducationForm initialData={portfolioData.education} onSave={handleSaveEducation} />
+          )}
+
+          {activeEditSection === "skills" && (
+            <SkillsForm initialData={portfolioData.skills} onSave={handleSaveSkills} />
+          )}
+
+          {activeEditSection === "languages" && (
+            <LanguagesForm initialData={portfolioData.languages} onSave={handleSaveLanguages} />
+          )}
+
+          {activeEditSection === "projects" && (
+            <ProjectForm initialData={portfolioData.projects} onSave={handleSaveProjects} />
+          )}
+
+          {activeEditSection === "references" && (
+            <ReferencesForm initialData={portfolioData.references} onSave={handleSaveReferences} />
+          )}
+
+          {activeEditSection === "contact" && (
+            <ContactForm initialData={portfolioData.contact} onSave={handleSaveContact} />
           )}
         </div>
       )}

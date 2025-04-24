@@ -23,6 +23,27 @@ function Navbar() {
     return () => unsubscribe()
   }, [])
 
+  // Add a console log to debug video loading
+  useEffect(() => {
+    const videoElement = document.querySelector("video")
+    if (videoElement) {
+      videoElement.addEventListener("error", (e) => {
+        console.error("Error loading video:", e)
+      })
+
+      videoElement.addEventListener("loadeddata", () => {
+        console.log("Video loaded successfully")
+      })
+    }
+
+    return () => {
+      if (videoElement) {
+        videoElement.removeEventListener("error", () => {})
+        videoElement.removeEventListener("loadeddata", () => {})
+      }
+    }
+  }, [])
+
   const handleClick = () => setClick(!click)
   const closeMobileMenu = () => setClick(false)
 
