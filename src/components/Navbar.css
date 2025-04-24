@@ -200,3 +200,53 @@ video {
   }
 }
 
+/* Añadir estos estilos al final del archivo para los elementos de usuario autenticado: */
+
+.user-nav-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.user-greeting {
+  color: #fff;
+  font-size: 0.9rem;
+}
+
+.logout-btn {
+  background-color: transparent;
+  color: #fff;
+  border: 1px solid #fff;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.logout-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.logout-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 1rem;
+  height: 100%;
+  color: #fff;
+  font-size: 1.2rem;
+}
+
+.logout-button:hover {
+  border-bottom: 4px solid #fff;
+  transition: all 0.2s ease-out;
+}
+
+@media screen and (max-width: 960px) {
+  .user-nav-info {
+    display: none;
+  }
+}

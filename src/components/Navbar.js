@@ -5,11 +5,23 @@ import { Button } from "./Button"
 import { Link } from "react-router-dom"
 import "./Navbar.css"
 import video from "../videos/Fondo.mp4"
+import { auth } from "./firebase"
 
 function Navbar() {
   const [click, setClick] = useState(false)
   const [button, setButton] = useState(true)
+  const [user, setUser] = useState(null)
   const navRef = useRef(null)
+
+  // Verificar si el usuario está autenticado
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+      setUser(currentUser)
+    })
+
+    // Limpiar el listener cuando el componente se desmonte
+    return () => unsubscribe()
+  }, [])
 
   const handleClick = () => setClick(!click)
   const closeMobileMenu = () => setClick(false)
@@ -52,9 +64,22 @@ function Navbar() {
     return () => {
       document.body.style.overflow = "auto"
     }
-  }, [click, showButton])  // Agregar showButton como dependencia
+  }, [click, showButton]) // Agregar showButton como dependencia
 
   window.addEventListener("resize", showButton)
+
+  // Función para cerrar sesión
+  const handleLogout = () => {
+    auth
+      .signOut()
+      .then(() => {
+        // Redirigir a la página de inicio después de cerrar sesión
+        window.location.href = "/"
+      })
+      .catch((error) => {
+        console.error("Error al cerrar sesión:", error)
+      })
+  }
 
   return (
     <>
@@ -73,17 +98,40 @@ function Navbar() {
                 Inicio
               </Link>
             </li>
-            <li className="nav-item mobile-only">
-              <Link to="/Sesion" className="nav-links" onClick={closeMobileMenu}>
-                Iniciar Sesión
-              </Link>
-            </li>
+            {user ? (
+              <>
+                <li className="nav-item">
+                  <Link to="/SobreMi" className="nav-links" onClick={closeMobileMenu}>
+                    Mi Portafolio
+                  </Link>
+                </li>
+                <li className="nav-item mobile-only">
+                  <button className="nav-links logout-button" onClick={handleLogout}>
+                    Cerrar Sesión
+                  </button>
+                </li>
+              </>
+            ) : (
+              <li className="nav-item mobile-only">
+                <Link to="/Sesion" className="nav-links" onClick={closeMobileMenu}>
+                  Iniciar Sesión
+                </Link>
+              </li>
+            )}
           </ul>
-          {button && (
-            <Link to="/Sesion" className="btn-link" onClick={closeMobileMenu}>
-              <Button buttonStyle="btn--outline">Iniciar Sesión</Button>
-            </Link>
-          )}
+          {button &&
+            (user ? (
+              <div className="user-nav-info">
+                <span className="user-greeting">Hola, {user.displayName || user.email.split("@")[0]}</span>
+                <button onClick={handleLogout} className="btn-outline logout-btn">
+                  Cerrar Sesión
+                </button>
+              </div>
+            ) : (
+              <Link to="/Sesion" className="btn-link" onClick={closeMobileMenu}>
+                <Button buttonStyle="btn--outline">Iniciar Sesión</Button>
+              </Link>
+            ))}
         </div>
       </nav>
       {/* Overlay para cuando el menú móvil está abierto */}

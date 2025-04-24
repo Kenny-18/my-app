@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import "./PersonalInfoForm.css"
+import { auth, database } from "../firebase"
+import { ref, set } from "firebase/database"
 
 export default function PersonalInfoForm({ onSave, initialData }) {
   const {
@@ -10,6 +12,7 @@ export default function PersonalInfoForm({ onSave, initialData }) {
     handleSubmit,
     formState: { errors },
     reset,
+    watch,
   } = useForm({
     defaultValues: initialData || {
       fullName: "",
@@ -26,6 +29,9 @@ export default function PersonalInfoForm({ onSave, initialData }) {
 
   const [isSaving, setIsSaving] = useState(false)
   const [saveSuccess, setSaveSuccess] = useState(false)
+  const [saveError, setSaveError] = useState("")
+
+  const bioLength = watch("bio")?.length || 0
 
   // Reset form when initialData changes
   useEffect(() => {
@@ -34,12 +40,21 @@ export default function PersonalInfoForm({ onSave, initialData }) {
     }
   }, [initialData, reset])
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     setIsSaving(true)
+    setSaveError("")
 
-    // Simulate API call
-    setTimeout(() => {
-      // Save to localStorage
+    try {
+      const user = auth.currentUser
+      if (!user) {
+        throw new Error("Usuario no autenticado")
+      }
+
+      // Guardar en Firebase
+      const portfolioRef = ref(database, `portfolios/${user.uid}/personalInfo`)
+      await set(portfolioRef, data)
+
+      // Guardar en localStorage como respaldo
       localStorage.setItem("personalInfo", JSON.stringify(data))
 
       // Call parent component's save handler
@@ -47,14 +62,18 @@ export default function PersonalInfoForm({ onSave, initialData }) {
         onSave(data)
       }
 
-      setIsSaving(false)
       setSaveSuccess(true)
 
       // Hide success message after 3 seconds
       setTimeout(() => {
         setSaveSuccess(false)
       }, 3000)
-    }, 600)
+    } catch (error) {
+      console.error("Error al guardar información personal:", error)
+      setSaveError("No se pudo guardar la información. Inténtalo de nuevo.")
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   return (
@@ -214,7 +233,7 @@ export default function PersonalInfoForm({ onSave, initialData }) {
           ></textarea>
           {errors.bio && <span className="error-message">{errors.bio.message}</span>}
           <div className="char-counter">
-            <span>{initialData?.bio?.length || 0}</span>/500
+            <span>{bioLength}</span>/500
           </div>
         </div>
 
@@ -229,8 +248,13 @@ export default function PersonalInfoForm({ onSave, initialData }) {
             <i className="fas fa-check-circle"></i> Información guardada correctamente
           </div>
         )}
+
+        {saveError && (
+          <div className="error-message-banner">
+            <i className="fas fa-exclamation-circle"></i> {saveError}
+          </div>
+        )}
       </form>
     </div>
   )
 }
-
