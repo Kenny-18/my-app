@@ -37,4 +37,3 @@ function Segundaparte() {
 }
 
 export default Segundaparte
-

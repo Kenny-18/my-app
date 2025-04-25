@@ -13,10 +13,11 @@ import SkillsForm from "./SkillsForm"
 import LanguagesForm from "./LanguagesForm"
 import ReferencesForm from "./ReferencesForm"
 import ContactForm from "./ContactForm"
+import CompletionBar from "../CompletionBar"
 import { auth, database } from "../firebase"
 import { ref, get } from "firebase/database"
-// 1. Añadir la importación del nuevo componente PortfolioPreview
 import PortfolioPreview from "./PortfolioPreview"
+import "../animations.css"
 
 export default function SobreMi() {
   const navigate = useNavigate()
@@ -27,6 +28,7 @@ export default function SobreMi() {
   // Estado para controlar las pestañas
   const [activeTab, setActiveTab] = useState("preview")
   const [activeEditSection, setActiveEditSection] = useState("personal")
+  const [, setAnimating] = useState(false)
 
   // Estado para almacenar los datos del portafolio
   const [portfolioData, setPortfolioData] = useState({
@@ -51,10 +53,7 @@ export default function SobreMi() {
     contact: {},
   })
 
-  // Mover la función loadFromLocalStorage fuera del useEffect para que sea accesible en todo el componente
-  // Añadir esta función justo después de la declaración de los estados, antes del useEffect
-
-  // Añadir esta función después de la línea donde se declaran los estados (aproximadamente línea 45)
+  // Función para cargar desde localStorage
   const loadFromLocalStorage = () => {
     console.log("Cargando datos desde localStorage")
     try {
@@ -213,12 +212,6 @@ export default function SobreMi() {
       }
     }
 
-    // Función para cargar desde localStorage como respaldo
-    // Ahora eliminar la definición de loadFromLocalStorage dentro del useEffect
-    // Buscar la definición dentro del useEffect (aproximadamente línea 150) y eliminarla
-    // Reemplazar la definición completa de la función con:
-    // const loadFromLocalStorage = loadFromLocalStorage;
-
     return () => {
       unsubscribe()
       clearTimeout(authTimeout)
@@ -305,18 +298,54 @@ export default function SobreMi() {
   const profilePhotoURL =
     portfolioData.personalInfo?.photoURL || user?.photoURL || "/placeholder.svg?height=100&width=100"
 
-  // Add a function to handle image loading errors
+  // Manejar errores de carga de imágenes
   const handleImageError = (e) => {
     console.error("Error loading image:", e.target.src)
     e.target.src = "https://via.placeholder.com/100"
     e.target.onerror = null // Prevent infinite loop
   }
 
-  // Function to force load default data
+  // Función para forzar la carga de datos predeterminados
   const handleForceLoad = () => {
     setLoading(false)
     setLoadError("Carga forzada. Usando datos predeterminados.")
     loadFromLocalStorage()
+  }
+
+  // Función para cambiar de pestaña con animación
+  const handleTabChange = (tab) => {
+    if (tab === activeTab) return
+
+    setAnimating(true)
+
+    // Ocultar contenido actual
+    const currentContent = document.querySelector(".portfolio-content > div")
+    if (currentContent) {
+      currentContent.style.opacity = "0"
+      currentContent.style.transform = "translateY(10px)"
+    }
+
+    // Cambiar pestaña después de un breve retraso
+    setTimeout(() => {
+      setActiveTab(tab)
+
+      // Mostrar nuevo contenido con animación
+      setTimeout(() => {
+        const newContent = document.querySelector(".portfolio-content > div")
+        if (newContent) {
+          newContent.style.transition = "opacity 0.3s, transform 0.3s"
+          newContent.style.opacity = "1"
+          newContent.style.transform = "translateY(0)"
+        }
+        setAnimating(false)
+      }, 50)
+    }, 300)
+  }
+
+  // Función para manejar la edición desde la vista previa
+  const handleEditFromPreview = (section) => {
+    handleTabChange("edit")
+    setActiveEditSection(section)
   }
 
   if (loading) {
@@ -331,16 +360,10 @@ export default function SobreMi() {
     )
   }
 
-  // 3. Añadir una función para manejar la edición rápida desde la vista previa
-  const handleEditFromPreview = (section) => {
-    setActiveTab("edit")
-    setActiveEditSection(section)
-  }
-
   return (
     <div className="portfolio-container">
       {loadError && (
-        <div className="error-message-banner">
+        <div className="error-message-banner animate-fade-in">
           <i className="fas fa-exclamation-circle"></i> {loadError}
         </div>
       )}
@@ -350,7 +373,7 @@ export default function SobreMi() {
           <img
             src={profilePhotoURL || "/placeholder.svg"}
             alt="Foto de perfil"
-            className="user-avatar"
+            className="user-avatar button-hover-effect"
             onError={handleImageError}
           />
           <div>
@@ -360,119 +383,96 @@ export default function SobreMi() {
         </div>
         <div className="portfolio-tabs">
           <button
-            className={`tab-button ${activeTab === "preview" ? "active" : ""}`}
-            onClick={() => setActiveTab("preview")}
+            className={`tab-button button-hover-effect ${activeTab === "preview" ? "active" : ""}`}
+            onClick={() => handleTabChange("preview")}
           >
             Vista Previa
           </button>
-          <button className={`tab-button ${activeTab === "edit" ? "active" : ""}`} onClick={() => setActiveTab("edit")}>
+          <button
+            className={`tab-button button-hover-effect ${activeTab === "edit" ? "active" : ""}`}
+            onClick={() => handleTabChange("edit")}
+          >
             Editar Perfil
           </button>
         </div>
       </div>
 
-      {activeTab === "preview" ? (
-        <PortfolioPreview portfolioData={portfolioData} onEditSection={handleEditFromPreview} />
-      ) : (
-        <div className="portfolio-edit-content">
-          <div className="edit-sections-tabs">
-            <button
-              className={`edit-section-tab ${activeEditSection === "photo" ? "active" : ""}`}
-              onClick={() => setActiveEditSection("photo")}
-            >
-              Foto de Perfil
-            </button>
-            <button
-              className={`edit-section-tab ${activeEditSection === "personal" ? "active" : ""}`}
-              onClick={() => setActiveEditSection("personal")}
-            >
-              Información Personal
-            </button>
-            <button
-              className={`edit-section-tab ${activeEditSection === "experience" ? "active" : ""}`}
-              onClick={() => setActiveEditSection("experience")}
-            >
-              Experiencia Laboral
-            </button>
-            <button
-              className={`edit-section-tab ${activeEditSection === "education" ? "active" : ""}`}
-              onClick={() => setActiveEditSection("education")}
-            >
-              Formación Académica
-            </button>
-            <button
-              className={`edit-section-tab ${activeEditSection === "skills" ? "active" : ""}`}
-              onClick={() => setActiveEditSection("skills")}
-            >
-              Habilidades
-            </button>
-            <button
-              className={`edit-section-tab ${activeEditSection === "languages" ? "active" : ""}`}
-              onClick={() => setActiveEditSection("languages")}
-            >
-              Idiomas
-            </button>
-            <button
-              className={`edit-section-tab ${activeEditSection === "projects" ? "active" : ""}`}
-              onClick={() => setActiveEditSection("projects")}
-            >
-              Proyectos
-            </button>
-            <button
-              className={`edit-section-tab ${activeEditSection === "references" ? "active" : ""}`}
-              onClick={() => setActiveEditSection("references")}
-            >
-              Referencias
-            </button>
-            <button
-              className={`edit-section-tab ${activeEditSection === "contact" ? "active" : ""}`}
-              onClick={() => setActiveEditSection("contact")}
-            >
-              Contacto
-            </button>
+      {/* Barra de progreso de completitud */}
+      <CompletionBar portfolioData={portfolioData} />
+
+      <div className="portfolio-content">
+        {activeTab === "preview" ? (
+          <div className="animate-fade-in">
+            <PortfolioPreview portfolioData={portfolioData} onEditSection={handleEditFromPreview} />
           </div>
+        ) : (
+          <div className="portfolio-edit-content animate-fade-in">
+            <div className="edit-sections-tabs">
+              {[
+                { id: "photo", label: "Foto de Perfil" },
+                { id: "personal", label: "Información Personal" },
+                { id: "experience", label: "Experiencia Laboral" },
+                { id: "education", label: "Formación Académica" },
+                { id: "skills", label: "Habilidades" },
+                { id: "languages", label: "Idiomas" },
+                { id: "projects", label: "Proyectos" },
+                { id: "references", label: "Referencias" },
+                { id: "contact", label: "Contacto" },
+              ].map((section) => (
+                <button
+                  key={section.id}
+                  className={`edit-section-tab button-hover-effect ${activeEditSection === section.id ? "active" : ""}`}
+                  onClick={() => setActiveEditSection(section.id)}
+                >
+                  {section.label}
+                </button>
+              ))}
+            </div>
 
-          {activeEditSection === "photo" && (
-            <ProfilePhotoUploader
-              currentPhotoURL={profilePhotoURL}
-              onPhotoUpdate={handlePhotoUpdate}
-              userId={user?.uid}
-            />
-          )}
+            <div className="animate-fade-in">
+              {activeEditSection === "photo" && (
+                <ProfilePhotoUploader
+                  currentPhotoURL={profilePhotoURL}
+                  onPhotoUpdate={handlePhotoUpdate}
+                  userId={user?.uid}
+                />
+              )}
 
-          {activeEditSection === "personal" && (
-            <PersonalInfoForm initialData={portfolioData.personalInfo} onSave={handleSavePersonalInfo} />
-          )}
+              {activeEditSection === "personal" && (
+                <PersonalInfoForm initialData={portfolioData.personalInfo} onSave={handleSavePersonalInfo} />
+              )}
 
-          {activeEditSection === "experience" && (
-            <ExperienceForm initialData={portfolioData.experience} onSave={handleSaveExperience} />
-          )}
+              {activeEditSection === "experience" && (
+                <ExperienceForm initialData={portfolioData.experience} onSave={handleSaveExperience} />
+              )}
 
-          {activeEditSection === "education" && (
-            <EducationForm initialData={portfolioData.education} onSave={handleSaveEducation} />
-          )}
+              {activeEditSection === "education" && (
+                <EducationForm initialData={portfolioData.education} onSave={handleSaveEducation} />
+              )}
 
-          {activeEditSection === "skills" && (
-            <SkillsForm initialData={portfolioData.skills} onSave={handleSaveSkills} />
-          )}
+              {activeEditSection === "skills" && (
+                <SkillsForm initialData={portfolioData.skills} onSave={handleSaveSkills} />
+              )}
 
-          {activeEditSection === "languages" && (
-            <LanguagesForm initialData={portfolioData.languages} onSave={handleSaveLanguages} />
-          )}
+              {activeEditSection === "languages" && (
+                <LanguagesForm initialData={portfolioData.languages} onSave={handleSaveLanguages} />
+              )}
 
-          {activeEditSection === "projects" && (
-            <ProjectForm initialData={portfolioData.projects} onSave={handleSaveProjects} />
-          )}
+              {activeEditSection === "projects" && (
+                <ProjectForm initialData={portfolioData.projects} onSave={handleSaveProjects} />
+              )}
 
-          {activeEditSection === "references" && (
-            <ReferencesForm initialData={portfolioData.references} onSave={handleSaveReferences} />
-          )}
+              {activeEditSection === "references" && (
+                <ReferencesForm initialData={portfolioData.references} onSave={handleSaveReferences} />
+              )}
 
-          {activeEditSection === "contact" && (
-            <ContactForm initialData={portfolioData.contact} onSave={handleSaveContact} />
-          )}
-        </div>
-      )}
+              {activeEditSection === "contact" && (
+                <ContactForm initialData={portfolioData.contact} onSave={handleSaveContact} />
+              )}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

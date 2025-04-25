@@ -1,0 +1,171 @@
+/* Estilos para animaciones y transiciones */
+
+/* Animaciones de página */
+.page-transition-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.page-transition-exit {
+  opacity: 1;
+}
+
+.page-transition-exit-active {
+  opacity: 0;
+  transition: opacity 300ms;
+}
+
+/* Animaciones para elementos de formulario */
+.form-animation-enter {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+.form-animation-enter-active {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.form-animation-exit {
+  opacity: 1;
+}
+
+.form-animation-exit-active {
+  opacity: 0;
+  transition: opacity 300ms;
+}
+
+/* Animaciones para tarjetas y elementos de lista */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Clases de animación para usar con elementos */
+.animate-fade-in {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+.animate-slide-in {
+  animation: slideIn 0.5s ease forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.5s ease forwards;
+}
+
+/* Animaciones con retraso para listas */
+.staggered-item {
+  opacity: 0;
+}
+
+.staggered-item:nth-child(1) {
+  animation: fadeIn 0.5s ease forwards 0.1s;
+}
+
+.staggered-item:nth-child(2) {
+  animation: fadeIn 0.5s ease forwards 0.2s;
+}
+
+.staggered-item:nth-child(3) {
+  animation: fadeIn 0.5s ease forwards 0.3s;
+}
+
+.staggered-item:nth-child(4) {
+  animation: fadeIn 0.5s ease forwards 0.4s;
+}
+
+.staggered-item:nth-child(5) {
+  animation: fadeIn 0.5s ease forwards 0.5s;
+}
+
+/* Animaciones para botones */
+.button-hover-effect {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.button-hover-effect:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Animaciones para mensajes de éxito/error */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.message-animation {
+  animation: slideInRight 0.3s ease forwards;
+}
+
+/* Animación de carga */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.loading-pulse {
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+/* Transiciones para cambios de tab */
+.tab-transition {
+  transition: all 0.3s ease;
+}
+
+/* Animación para el indicador de tab activo */
+.tab-indicator {
+  transition: transform 0.3s ease, width 0.3s ease;
+}

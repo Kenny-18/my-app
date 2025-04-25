@@ -3,8 +3,9 @@
 }
 
 .presentacion {
+  color: #ffffff;
+  font-size: 80px;
   text-align: center;
-  font-size: 48px;
 }
 .informacion {
   text-align: center;
@@ -182,4 +183,3 @@
     margin-bottom: 20px;
   }
 }
-

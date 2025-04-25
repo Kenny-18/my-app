@@ -1,11 +1,13 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import "./ProjectForm.css"
 import { auth, database, storage } from "../firebase"
 import { ref, set } from "firebase/database"
-import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage"
+import { ref as storageRef, deleteObject } from "firebase/storage"
+import ImageUploader from "../ImageUploader"
+import { motion } from "framer-motion"
 
 export default function ProjectForm({ onSave, initialData = [] }) {
   const [projectList, setProjectList] = useState(initialData)
@@ -13,11 +15,10 @@ export default function ProjectForm({ onSave, initialData = [] }) {
   const [saveSuccess, setSaveSuccess] = useState(false)
   const [saveError, setSaveError] = useState("")
   const [screenshots, setScreenshots] = useState([])
-  const [uploading, setUploading] = useState(false)
+  const [uploading] = useState(false)
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [currentImage, setCurrentImage] = useState(0)
   const [viewingProjectImages, setViewingProjectImages] = useState([])
-  const fileInputRef = useRef(null)
 
   const {
     register,
@@ -76,62 +77,6 @@ export default function ProjectForm({ onSave, initialData = [] }) {
     }
   }, [projectList, onSave, initialData])
 
-  const handleScreenshotUpload = async (e) => {
-    const files = Array.from(e.target.files)
-    if (files.length === 0) return
-
-    setUploading(true)
-    setSaveError("")
-
-    try {
-      const user = auth.currentUser
-      if (!user) {
-        throw new Error("Usuario no autenticado")
-      }
-
-      const newScreenshots = [...screenshots]
-
-      for (const file of files) {
-        // Validar tipo de archivo
-        if (!file.type.startsWith("image/")) {
-          setSaveError("Solo se permiten archivos de imagen")
-          continue
-        }
-
-        // Validar tamaño (máximo 2MB)
-        if (file.size > 2 * 1024 * 1024) {
-          setSaveError("Las imágenes no deben superar los 2MB")
-          continue
-        }
-
-        // Crear un objeto URL para previsualización
-        const imageUrl = URL.createObjectURL(file)
-
-        // Subir a Firebase Storage
-        const imageRef = storageRef(storage, `projects/${user.uid}/${Date.now()}-${file.name}`)
-        await uploadBytes(imageRef, file)
-        const downloadUrl = await getDownloadURL(imageRef)
-
-        newScreenshots.push({
-          url: downloadUrl,
-          storagePath: imageRef.fullPath,
-          previewUrl: imageUrl,
-        })
-      }
-
-      setScreenshots(newScreenshots)
-    } catch (error) {
-      console.error("Error al subir capturas:", error)
-      setSaveError("Error al subir las capturas de pantalla")
-    } finally {
-      setUploading(false)
-      // Limpiar input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = ""
-      }
-    }
-  }
-
   const handleRemoveScreenshot = async (index) => {
     try {
       const screenshot = screenshots[index]
@@ -145,11 +90,6 @@ export default function ProjectForm({ onSave, initialData = [] }) {
         } catch (error) {
           console.error("Error al eliminar imagen de Storage:", error)
         }
-      }
-
-      // Liberar URL de objeto si existe
-      if (screenshot.previewUrl) {
-        URL.revokeObjectURL(screenshot.previewUrl)
       }
 
       // Actualizar estado
@@ -169,7 +109,7 @@ export default function ProjectForm({ onSave, initialData = [] }) {
       // Preparar datos del proyecto
       const projectData = {
         ...data,
-        technologies: data.technologies.split(",").map((tech) => tech.trim()),
+        technologies: data.technologies ? data.technologies.split(",").map((tech) => tech.trim()) : [],
         screenshots: screenshots.map((screenshot) => ({
           url: screenshot.url,
           storagePath: screenshot.storagePath,
@@ -215,7 +155,11 @@ export default function ProjectForm({ onSave, initialData = [] }) {
     setValue("description", itemToEdit.description)
     setValue(
       "technologies",
-      Array.isArray(itemToEdit.technologies) ? itemToEdit.technologies.join(", ") : itemToEdit.technologies,
+      Array.isArray(itemToEdit.technologies)
+        ? itemToEdit.technologies.join(", ")
+        : typeof itemToEdit.technologies === "string"
+          ? itemToEdit.technologies
+          : "",
     )
     setValue("link", itemToEdit.link || "")
 
@@ -314,6 +258,8 @@ export default function ProjectForm({ onSave, initialData = [] }) {
     setCurrentImage((prev) => (prev === viewingProjectImages.length - 1 ? 0 : prev + 1))
   }
 
+  const user = auth.currentUser
+
   return (
     <div className="project-form-container">
       <h2>Proyectos</h2>
@@ -343,11 +289,13 @@ export default function ProjectForm({ onSave, initialData = [] }) {
                           {tech}
                         </span>
                       ))
-                    : project.technologies.split(",").map((tech, techIndex) => (
-                        <span key={techIndex} className="tech-tag">
-                          {tech.trim()}
-                        </span>
-                      ))}
+                    : typeof project.technologies === "string"
+                      ? project.technologies.split(",").map((tech, techIndex) => (
+                          <span key={techIndex} className="tech-tag">
+                            {tech.trim()}
+                          </span>
+                        ))
+                      : null}
                 </div>
 
                 {project.link && (
@@ -465,29 +413,39 @@ export default function ProjectForm({ onSave, initialData = [] }) {
         <div className="form-group">
           <label>Capturas de pantalla</label>
           <div className="screenshot-upload-container">
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleScreenshotUpload}
-              accept="image/*"
-              multiple
-              className="screenshot-upload-input"
-              disabled={uploading}
+            <ImageUploader
+              onImageUpload={(imageData) => {
+                // Handle both single and multiple images
+                const newScreenshots = Array.isArray(imageData) ? imageData : [imageData]
+
+                // Add the new screenshots to the existing ones
+                setScreenshots((prev) => [
+                  ...prev,
+                  ...newScreenshots.map((img) => ({
+                    url: img.url,
+                    storagePath: img.path,
+                  })),
+                ])
+              }}
+              userId={user?.uid}
+              path="projects/screenshots"
+              allowMultiple={true}
+              maxSize={2}
+              acceptedTypes={["image/jpeg", "image/png", "image/webp"]}
+              previewSize={{ width: 100, height: 100 }}
             />
-            <button
-              type="button"
-              onClick={() => fileInputRef.current.click()}
-              className="screenshot-upload-button"
-              disabled={uploading}
-            >
-              <i className="fas fa-camera"></i>
-              {uploading ? "Subiendo..." : "Añadir capturas de pantalla"}
-            </button>
 
             {screenshots.length > 0 && (
-              <div className="screenshot-preview">
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="screenshot-preview">
                 {screenshots.map((screenshot, index) => (
-                  <div key={index} className="screenshot-preview-item">
+                  <motion.div
+                    key={index}
+                    className="screenshot-preview-item"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    transition={{ duration: 0.2 }}
+                  >
                     <img
                       src={screenshot.url || screenshot.previewUrl}
                       alt={`Captura ${index + 1}`}
@@ -499,9 +457,9 @@ export default function ProjectForm({ onSave, initialData = [] }) {
                     <button type="button" className="remove-screenshot" onClick={() => handleRemoveScreenshot(index)}>
                       ×
                     </button>
-                  </div>
+                  </motion.div>
                 ))}
-              </div>
+              </motion.div>
             )}
           </div>
         </div>

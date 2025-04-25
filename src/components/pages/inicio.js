@@ -1,8 +1,7 @@
-import React from 'react';
-import '../../App.css';
-import Terceraparte from '../Terceraparte';
-import Primerparte from '../Primerparte';
-import Segundaparte from '../Segundaparte';
+import "../../App.css"
+import Terceraparte from "../Terceraparte"
+import Primerparte from "../Primerparte"
+import Segundaparte from "../Segundaparte"
 
 function inicio() {
   return (
@@ -11,7 +10,7 @@ function inicio() {
       <Segundaparte />
       <Terceraparte />
     </>
-  );
+  )
 }
 
-export default inicio;
+export default inicio

@@ -82,4 +82,3 @@ function Terceraparte() {
 }
 
 export default Terceraparte
-

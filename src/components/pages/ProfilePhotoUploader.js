@@ -5,6 +5,8 @@ import { storage, database } from "../firebase"
 import { ref as storageRef, uploadBytesResumable, getDownloadURL } from "firebase/storage"
 import { ref as dbRef, update } from "firebase/database"
 import "./ProfilePhotoUploader.css"
+import ImageUploader from "../ImageUploader"
+import { motion } from "framer-motion"
 
 export default function ProfilePhotoUploader({ currentPhotoURL, onPhotoUpdate, userId }) {
   const [uploading, setUploading] = useState(false)
@@ -30,7 +32,82 @@ export default function ProfilePhotoUploader({ currentPhotoURL, onPhotoUpdate, u
     setDebugInfo((prev) => [...prev, { time: new Date().toISOString(), message }])
   }
 
-  function handleFileChange(e) {
+  // Función para subir la imagen directamente a Firebase
+  const uploadImageToFirebase = async (file) => {
+    if (!userId) {
+      setError("Usuario no autenticado")
+      addDebugInfo("Error: Usuario no autenticado")
+      return null
+    }
+
+    setUploading(true)
+    setError("")
+    setUploadProgress(0)
+
+    try {
+      addDebugInfo(`Iniciando subida de imagen: ${file.name}`)
+
+      // Crear una referencia única para el archivo
+      const timestamp = Date.now()
+      const filename = `${timestamp}-${file.name.replace(/[^a-zA-Z0-9.]/g, "_")}`
+      const filePath = `profile-photos/${userId}/${filename}`
+      const fileRef = storageRef(storage, filePath)
+
+      addDebugInfo(`Referencia creada: ${filePath}`)
+
+      // Crear tarea de subida
+      const uploadTask = uploadBytesResumable(fileRef, file)
+
+      // Monitorear progreso
+      return new Promise((resolve, reject) => {
+        uploadTask.on(
+          "state_changed",
+          (snapshot) => {
+            const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100)
+            setUploadProgress(progress)
+            addDebugInfo(`Progreso: ${progress}%`)
+          },
+          (error) => {
+            addDebugInfo(`Error en la subida: ${error.message}`)
+            setError(`Error al subir: ${error.message}`)
+            setUploading(false)
+            reject(error)
+          },
+          async () => {
+            try {
+              // Obtener URL de descarga
+              const downloadURL = await getDownloadURL(uploadTask.snapshot.ref)
+              addDebugInfo(`Subida completada. URL: ${downloadURL}`)
+
+              // Actualizar en la base de datos
+              const userProfileRef = dbRef(database, `portfolios/${userId}/personalInfo`)
+              await update(userProfileRef, { photoURL: downloadURL })
+              addDebugInfo(`Base de datos actualizada`)
+
+              setUploading(false)
+              setSuccess(true)
+              setTimeout(() => setSuccess(false), 3000)
+
+              resolve(downloadURL)
+            } catch (error) {
+              addDebugInfo(`Error al finalizar: ${error.message}`)
+              setError(`Error al finalizar: ${error.message}`)
+              setUploading(false)
+              reject(error)
+            }
+          },
+        )
+      })
+    } catch (error) {
+      addDebugInfo(`Error al iniciar la subida: ${error.message}`)
+      setError(`Error al iniciar la subida: ${error.message}`)
+      setUploading(false)
+      return null
+    }
+  }
+
+  // Manejador para cuando se selecciona un archivo
+  const handleFileSelect = async (e) => {
     const file = e.target.files[0]
     if (!file) return
 
@@ -53,111 +130,19 @@ export default function ProfilePhotoUploader({ currentPhotoURL, onPhotoUpdate, u
     const objectUrl = URL.createObjectURL(file)
     setPreviewImage(objectUrl)
 
-    // Modo local temporal - actualizar solo la vista previa
-    if (window.confirm("¿Deseas usar el modo local temporal? (La imagen no se subirá a Firebase)")) {
-      addDebugInfo("Usando modo local temporal")
-      setUploading(false)
-      setSuccess(true)
-      onPhotoUpdate(objectUrl) // Actualizar con URL local temporal
-      setTimeout(() => setSuccess(false), 3000)
-      return
-    }
-
-    setUploading(true)
-    setError("")
-    setSuccess(false)
-    setUploadProgress(0)
-
+    // Subir a Firebase
     try {
-      // Crear referencia para el archivo en Firebase Storage
-      const fileRef = storageRef(storage, `profile-photos/${userId}/${Date.now()}-${file.name}`)
-      addDebugInfo(`Referencia de almacenamiento creada: ${fileRef.fullPath}`)
-
-      // Crear la tarea de carga
-      addDebugInfo("Iniciando tarea de carga...")
-      const uploadTask = uploadBytesResumable(fileRef, file)
-
-      // Monitorear el progreso de la carga
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          // Actualizar el progreso basado en los bytes transferidos
-          const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100)
-          addDebugInfo(`Progreso de carga: ${progress}%, estado: ${snapshot.state}`)
-          setUploadProgress(progress)
-        },
-        (uploadError) => {
-          // Manejar errores
-          addDebugInfo(`Error durante la carga: ${uploadError.code} - ${uploadError.message}`)
-          setError(`Error al subir la imagen: ${uploadError.message}`)
-          setUploading(false)
-          if (fileInputRef.current) {
-            fileInputRef.current.value = ""
-          }
-        },
-        () => {
-          // Carga completada exitosamente
-          addDebugInfo("Carga completada, obteniendo URL de descarga...")
-          getDownloadURL(uploadTask.snapshot.ref)
-            .then((downloadURL) => {
-              addDebugInfo(`URL de descarga obtenida: ${downloadURL}`)
-
-              // Actualizar URL en la base de datos
-              const userProfileRef = dbRef(database, `portfolios/${userId}/personalInfo`)
-              addDebugInfo(`Actualizando base de datos en: portfolios/${userId}/personalInfo`)
-              return update(userProfileRef, { photoURL: downloadURL })
-            })
-            .then(() => {
-              addDebugInfo("Base de datos actualizada correctamente")
-              // Obtener la URL de descarga actualizada
-              return getDownloadURL(fileRef)
-            })
-            .then((finalURL) => {
-              addDebugInfo(`URL final obtenida: ${finalURL}`)
-              // Actualizar estado local con la URL final
-              onPhotoUpdate(finalURL)
-              setSuccess(true)
-              setTimeout(() => setSuccess(false), 3000)
-              setUploading(false)
-
-              // Limpiar el input de archivo
-              if (fileInputRef.current) {
-                fileInputRef.current.value = ""
-              }
-            })
-            .catch((finalError) => {
-              addDebugInfo(`Error al finalizar la subida: ${finalError.message}`)
-              setError(`Error al procesar la imagen subida: ${finalError.message}`)
-              setUploading(false)
-              if (fileInputRef.current) {
-                fileInputRef.current.value = ""
-              }
-            })
-        },
-      )
-    } catch (initError) {
-      addDebugInfo(`Error al iniciar la carga: ${initError.message}`)
-      setError(`Error al iniciar la carga: ${initError.message}`)
-      setUploading(false)
-      if (fileInputRef.current) {
-        fileInputRef.current.value = ""
+      const downloadURL = await uploadImageToFirebase(file)
+      if (downloadURL) {
+        onPhotoUpdate(downloadURL)
       }
+    } catch (error) {
+      console.error("Error al subir imagen:", error)
     }
-  }
 
-  const handleSelectFile = () => {
-    // Limpiar el input de archivo antes de abrirlo
+    // Limpiar input
     if (fileInputRef.current) {
       fileInputRef.current.value = ""
-    }
-    fileInputRef.current.click()
-  }
-
-  const handleUseLocalImage = () => {
-    if (previewImage) {
-      onPhotoUpdate(previewImage)
-      setSuccess(true)
-      setTimeout(() => setSuccess(false), 3000)
     }
   }
 
@@ -169,7 +154,10 @@ export default function ProfilePhotoUploader({ currentPhotoURL, onPhotoUpdate, u
       </p>
 
       <div className="photo-preview-container">
-        <img
+        <motion.img
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
           src={previewImage || currentPhotoURL || "/placeholder.svg"}
           alt="Foto de perfil"
           className="photo-preview"
@@ -182,27 +170,56 @@ export default function ProfilePhotoUploader({ currentPhotoURL, onPhotoUpdate, u
           <input
             type="file"
             ref={fileInputRef}
-            onChange={handleFileChange}
-            accept="image/jpeg, image/png, image/gif, image/webp"
-            className="file-input"
-            disabled={uploading}
+            onChange={handleFileSelect}
+            accept="image/jpeg,image/png,image/gif,image/webp"
+            style={{ display: "none" }}
           />
 
-          <button onClick={handleSelectFile} className="select-photo-button" disabled={uploading}>
-            {uploading ? "Subiendo..." : "Seleccionar nueva foto"}
+          <button className="select-photo-button" onClick={() => fileInputRef.current.click()} disabled={uploading}>
+            {uploading ? (
+              <>
+                <i className="fas fa-spinner fa-spin"></i> Subiendo...
+              </>
+            ) : (
+              <>
+                <i className="fas fa-upload"></i> Seleccionar Imagen
+              </>
+            )}
           </button>
 
-          {previewImage && !uploading && (
-            <button
-              onClick={handleUseLocalImage}
-              className="select-photo-button"
-              style={{ marginTop: "10px", backgroundColor: "#4a90e2" }}
-            >
-              Usar esta imagen (local)
-            </button>
-          )}
-
           <p className="photo-help-text">Formatos aceptados: JPEG, PNG, GIF, WebP. Tamaño máximo: 5MB.</p>
+
+          {/* Alternativa usando ImageUploader */}
+          <div style={{ marginTop: "20px" }}>
+            <h4 style={{ marginBottom: "10px" }}>O usa el cargador avanzado:</h4>
+            <ImageUploader
+              onImageUpload={(imageData) => {
+                if (imageData && imageData.url) {
+                  onPhotoUpdate(imageData.url)
+
+                  // También actualizar en la base de datos
+                  if (userId) {
+                    const userProfileRef = dbRef(database, `portfolios/${userId}/personalInfo`)
+                    update(userProfileRef, { photoURL: imageData.url })
+                      .then(() => {
+                        addDebugInfo(`Base de datos actualizada con URL: ${imageData.url}`)
+                        setSuccess(true)
+                        setTimeout(() => setSuccess(false), 3000)
+                      })
+                      .catch((error) => {
+                        addDebugInfo(`Error al actualizar base de datos: ${error.message}`)
+                      })
+                  }
+                }
+              }}
+              userId={userId}
+              path="profile-photos"
+              allowMultiple={false}
+              maxSize={5}
+              acceptedTypes={["image/jpeg", "image/png", "image/webp", "image/gif"]}
+              previewSize={{ width: 200, height: 200 }}
+            />
+          </div>
         </div>
       </div>
 

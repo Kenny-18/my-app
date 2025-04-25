@@ -22,7 +22,6 @@ export default function PersonalInfoForm({ onSave, initialData }) {
       location: "",
       bio: "",
       website: "",
-      linkedin: "",
       github: "",
     },
   })
@@ -176,23 +175,6 @@ export default function PersonalInfoForm({ onSave, initialData }) {
               })}
             />
             {errors.website && <span className="error-message">{errors.website.message}</span>}
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="linkedin">LinkedIn</label>
-            <input
-              id="linkedin"
-              type="url"
-              placeholder="https://linkedin.com/in/usuario"
-              className={errors.linkedin ? "error" : ""}
-              {...register("linkedin", {
-                pattern: {
-                  value: /^(https?:\/\/)?(www\.)?linkedin\.com\/in\/[\w-]+\/?$/,
-                  message: "URL de LinkedIn inválida",
-                },
-              })}
-            />
-            {errors.linkedin && <span className="error-message">{errors.linkedin.message}</span>}
           </div>
 
           <div className="form-group">

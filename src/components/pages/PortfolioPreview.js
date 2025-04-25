@@ -1,18 +1,12 @@
 "use client"
 
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
 import "./PortfolioPreview.css"
+import { exportToPdf } from "../SimplePdfExport" // Cambiado a la versión simplificada
 
 export default function PortfolioPreview({ portfolioData, onEditSection }) {
-  const navigate = useNavigate()
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [currentImage, setCurrentImage] = useState("")
-
-  // Función para volver a la edición
-  const handleBackToEdit = () => {
-    navigate("/SobreMi")
-  }
 
   // Función para editar una sección específica
   const handleEditSection = (section) => {
@@ -152,7 +146,7 @@ export default function PortfolioPreview({ portfolioData, onEditSection }) {
   }
 
   return (
-    <div className="portfolio-preview-container">
+    <div className="portfolio-preview-container" id="portfolio-preview-container">
       <div className="preview-header">
         <div className="preview-header-left">
           <img
@@ -170,14 +164,11 @@ export default function PortfolioPreview({ portfolioData, onEditSection }) {
           </div>
         </div>
         <div className="preview-actions">
-          <button className="preview-action-button secondary" onClick={handleBackToEdit}>
-            <i className="fas fa-edit"></i> Volver a Edición
-          </button>
           <button
             className="preview-action-button primary"
-            onClick={() => alert("La funcionalidad de descarga de PDF estará disponible próximamente")}
+            onClick={() => exportToPdf(portfolioData, "portfolio-preview-container")}
           >
-            <i className="fas fa-download"></i> Descargar PDF
+            <i className="fas fa-download"></i> Descargar Portfolio PDF
           </button>
         </div>
       </div>
@@ -476,11 +467,6 @@ export default function PortfolioPreview({ portfolioData, onEditSection }) {
           </div>
         </section>
       )}
-
-      {/* Botón flotante para volver a edición */}
-      <button className="back-to-edit-button" onClick={handleBackToEdit} title="Volver a Edición">
-        <i className="fas fa-arrow-left"></i>
-      </button>
 
       {/* Lightbox para imágenes */}
       {lightboxOpen && (
